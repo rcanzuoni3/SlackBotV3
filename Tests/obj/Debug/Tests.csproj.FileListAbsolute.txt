@@ -17,4 +17,3 @@ C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\Tests\bin\Debug\Newtonsoft.Json.x
 C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\Tests\obj\Debug\Tests.csprojResolveAssemblyReference.cache
 C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\Tests\obj\Debug\Tests.dll
 C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\Tests\obj\Debug\Tests.pdb
-C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\Tests\bin\Debug\Tests.dll.config

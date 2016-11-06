@@ -22,6 +22,5 @@ namespace Tests
 
 			Assert.Throws<KeyNotFoundException>(() => subject.GetBotToken(keyNotInAppConfig));
 		}
-
 	}
 }
