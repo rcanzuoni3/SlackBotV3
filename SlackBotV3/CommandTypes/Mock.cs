@@ -1,56 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using SlackAPI;
+
 namespace SlackBotV3.CommandTypes
 {
-	class MockType : CommandType
-    {
-        public override List<string> CommandNames() { return new List<string>() { "mock" }; }
-        public override string Help(string commandName) { return "Type mock followed by the username or real name of the user you want SlackBot to mock."; }
-        public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-        public override CommandScope GetCommandScope() { return CommandScope.Global; }
+	class MockType : ICommandType
+	{
+		private ICommandHandlerProvider commandHandlerProvider;
 
-        public override Type GetCommandHandlerType()
-        {
-            return typeof(Mock);
-        }
+		public List<string> CommandNames() { return new List<string>() { "mock" }; }
+		public string Help(string commandName) { return "Type mock followed by the username or real name of the user you want SlackBot to mock."; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(Mock); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
+		public MockType() : this(new CommandHandlerProvider()) { }
+		public MockType(ICommandHandlerProvider commandHandlerProvider)
+		{
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
 
-        class Mock : CommandHandler
-        {
-            public Mock(SlackBotV3 bot) : base(bot) { }
+	public class Mock : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+		public Mock(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
+		}
 
-            public override bool Execute(SlackBotCommand command)
-            {
-                User userToMock;
+		public bool Execute(SlackBotCommand command)
+		{
+			User userToMock;
 
-                if (string.IsNullOrWhiteSpace(command.Text))
-                    userToMock = command.User;
-                else
-                {
-                    string userId = command.Text;
-                    userToMock = SlackBot.GetUsers().Find(user => user.name == userId);
-                    if (userToMock == null)
-                        userToMock = SlackBot.GetUsers().Find(user => user.profile.real_name == userId);
+			if (string.IsNullOrWhiteSpace(command.Text))
+				userToMock = command.User;
+			else
+			{
+				string userId = command.Text;
+				userToMock = slackBot.GetUsers().Find(user => user.name == userId);
+				if (userToMock == null)
+					userToMock = slackBot.GetUsers().Find(user => user.profile.real_name == userId);
 
-                    if (userToMock == null)
-                    {
-                        userId = userId.Replace("\"", "");
-                        userId = "\"" + userId + "\"";
-                        SlackBot.Reply(command, string.Format("Sorry {0}, I cannot find user {1}", command.User.name, userId));
-                        return false; ;
-                    }
-                }
+				if (userToMock == null)
+				{
+					userId = userId.Replace("\"", "");
+					userId = "\"" + userId + "\"";
+					slackBot.Reply(command, string.Format("Sorry {0}, I cannot find user {1}", command.User.name, userId));
+					return false; ;
+				}
+			}
 
-                string userName;
-                if (!string.IsNullOrWhiteSpace(userToMock.profile.real_name))
-                    userName = userToMock.profile.real_name;
-                else
-                    userName = userToMock.name;
+			string userName;
+			if (!string.IsNullOrWhiteSpace(userToMock.profile.real_name))
+				userName = userToMock.profile.real_name;
+			else
+				userName = userToMock.name;
 
-                SlackBot.Reply(command, string.Format("I'm {0} and I'm dumb", userName), userName, userToMock.profile.image_32);
-                return false;
-            }
-        }
-    }
+			slackBot.Reply(command, string.Format("I'm {0} and I'm dumb", userName), userName, userToMock.profile.image_32);
+			return false;
+		}
+	}
 }

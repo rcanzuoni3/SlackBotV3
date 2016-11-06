@@ -8,23 +8,27 @@ using System.Web;
 
 namespace SlackBotV3.CommandTypes
 {
-	class MakeJokeType : CommandType
+	public class MakeJokeType : ICommandType
 	{
-		public override List<string> CommandNames() { return new List<string>() { "makejoke" }; }
-		public override string Help(string commandName) { return "Type makejoke followed by someones name"; }
-		public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-		public override CommandScope GetCommandScope() { return CommandScope.Global; }
+		private ICommandHandlerProvider commandHandlerProvider;
 
-		public override Type GetCommandHandlerType()
+		public List<string> CommandNames() { return new List<string>() { "makejoke" }; }
+		public string Help(string commandName) { return "Type makejoke followed by someones name"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(Weather); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot,GetCommandHandlerType()); }
+
+		public class Weather : ICommandHandler
 		{
-			return typeof(Weather);
-		}
+			private SlackBotV3 slackBot;
 
-		class Weather : CommandHandler
-		{
-			public Weather(SlackBotV3 bot) : base(bot) { }
+			public Weather(SlackBotV3 slackBot)
+			{
+				this.slackBot = slackBot;
+			}
 
-			public override bool Execute(SlackBotCommand command)
+			public bool Execute(SlackBotCommand command)
 			{
 				try
 				{
@@ -43,16 +47,16 @@ namespace SlackBotV3.CommandTypes
 					{
 						string joke = joResponse["value"]["joke"].ToString();
 						joke = joke.Replace("Chuck Norris", name);
-						SlackBot.Reply(command, HttpUtility.HtmlDecode(joke));
+						slackBot.Reply(command, HttpUtility.HtmlDecode(joke));
 					}
 					else
-						SlackBot.Reply(command, "Crap. I forgot to handle that case.");
+						slackBot.Reply(command, "Crap. I forgot to handle that case.");
 
 					return false;
 				}
 				catch (Exception)
 				{
-					SlackBot.Reply(command, "Stop trying to break slackbot");
+					slackBot.Reply(command, "Stop trying to break slackbot");
 					return false;
 				}
 			}

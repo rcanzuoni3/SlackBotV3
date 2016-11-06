@@ -5,27 +5,39 @@ using System.Text;
 
 namespace SlackBotV3.CommandHandlers
 {
-	class FeatureRequestType : CommandType
+	public class FeatureRequestType : ICommandType
 	{
-		public override List<string> CommandNames() { return new List<string>() { "feature", "featureRequest", "featurerequest", "featureList", "fl" }; }
-		public override string Help(string commandName) { return "Keep a log of the SlackBot feature requests"; }
-		public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-		public override CommandScope GetCommandScope() { return CommandScope.Global; }
+		ICommandHandlerProvider commandHandlerProvider;
 
-		public override Type GetCommandHandlerType()
+		public List<string> CommandNames() { return new List<string>() { "feature", "featureRequest", "featurerequest", "featureList", "fl" }; }
+		public string Help(string commandName) { return "Keep a log of the SlackBot feature requests"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(FeatureRequest); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
+
+		public FeatureRequestType() : this(new CommandHandlerProvider()) { }
+
+		public FeatureRequestType(ICommandHandlerProvider commandHandlerProvider)
 		{
-			return typeof(FeatureRequest);
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
+
+	public class FeatureRequest : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public FeatureRequest(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
 		}
 
-		class FeatureRequest : CommandHandler
+		private const string RequestListFileName = "FeatureRequests.csv";
+		private static readonly Encoding encoding = Encoding.ASCII;
+
+		private static readonly string[] ResponseStrings =
 		{
-			public FeatureRequest(SlackBotV3 bot) : base(bot) { }
-
-			private const string RequestListFileName = "FeatureRequests.csv";
-			private static readonly Encoding encoding = Encoding.ASCII;
-
-			private static readonly string[] ResponseStrings =
-			{
 				"Great idea! I'll start {0} right away!",
 				"OMG! I was just about to suggest {0}. Consider it done.",
 				"Yeah. I'll totally begin {0}.",
@@ -43,130 +55,129 @@ namespace SlackBotV3.CommandHandlers
 				"You know who would love to start {0}? Me neither."
 			};
 
-			public override bool Execute(SlackBotCommand command)
+		public bool Execute(SlackBotCommand command)
+		{
+			if (!(command.Channel.name == "the-bureau-of-anarchy" || command.Channel.name == "slackbot-test" || command.Channel.name == "the-anarchy"))
+				return true;
+
+			return (command.Name == "featureList" || command.Name == "fl") ? ReadFeatures(command) : WriteFeature(command);
+		}
+
+		private bool ReadFeatures(SlackBotCommand command)
+		{
+			int noOfLines = 0;
+			bool returnStatus = false;
+			string newline = "\n";//Environment.NewLine;??
+			int charSize = encoding.IsSingleByte ? 1 : 2;
+			byte[] buffer = null;
+			bool printed = false;
+			string temp = string.Empty;
+
+			FileStream stream = null;
+			try
 			{
-				if (!(command.Channel.name == "the-bureau-of-anarchy" || command.Channel.name == "slackbot-test"  || command.Channel.name == "the-anarchy"))
-					return true;
+				stream = new FileStream(GetRelFilePath(RequestListFileName), FileMode.Open,
+					FileAccess.Read, FileShare.Write);
+				long endPos = stream.Length / charSize, oldPos = 0;
+				long posLength;
+				printed = false;
+				noOfLines = 0;
+				buffer = new byte[charSize];
+				endPos = stream.Length / charSize;
+				if (endPos <= oldPos) oldPos = endPos;      // if file's content is 
+															//deleted, reset position
+				posLength = endPos - oldPos;
 
-				return (command.Name == "featureList" || command.Name =="fl") ? ReadFeatures(command) : WriteFeature(command);
-			}
-
-			private bool ReadFeatures(SlackBotCommand command)
-			{
-				int noOfLines = 0;
-				bool returnStatus = false;
-				string newline = "\n";//Environment.NewLine;??
-				int charSize = encoding.IsSingleByte ? 1 : 2;
-				byte[] buffer = null;
-				bool printed = false;
-				string temp = string.Empty;
-
-				FileStream stream = null;
-				try
+				for (long pos = charSize; pos <= posLength; pos += charSize)
 				{
-					stream = new FileStream(GetRelFilePath(RequestListFileName), FileMode.Open,
-						FileAccess.Read, FileShare.Write);
-					long endPos = stream.Length / charSize, oldPos = 0;
-					long posLength;
-					printed = false;
-					noOfLines = 0;
-					buffer = new byte[charSize];
-					endPos = stream.Length / charSize;
-					if (endPos <= oldPos) oldPos = endPos;  	// if file's content is 
-					//deleted, reset position
-					posLength = endPos - oldPos;
-
-					for (long pos = charSize; pos <= posLength; pos += charSize)
+					stream.Seek(-pos, SeekOrigin.End);
+					stream.Read(buffer, 0, charSize);
+					temp = encoding.GetString(buffer);
+					if (temp == newline)
 					{
-						stream.Seek(-pos, SeekOrigin.End);
-						stream.Read(buffer, 0, charSize);
-						temp = encoding.GetString(buffer);
-						if (temp == newline)
-						{
-							noOfLines++;
-						}
-						if (noOfLines == 11)
-						{
-							buffer = new byte[endPos - stream.Position];
-							stream.Read(buffer, 0, buffer.Length);
-							SlackBot.Reply(command, FormatRequestList(encoding.GetString(buffer)));
-							printed = true;
-							oldPos = endPos;
-							break;
-						}
+						noOfLines++;
 					}
-					if (!printed)
+					if (noOfLines == 11)
 					{
-						buffer = new byte[endPos - oldPos];
-						stream.Seek(-1, SeekOrigin.Current);
+						buffer = new byte[endPos - stream.Position];
 						stream.Read(buffer, 0, buffer.Length);
-						SlackBot.Reply(command, FormatRequestList(encoding.GetString(buffer)));
+						slackBot.Reply(command, FormatRequestList(encoding.GetString(buffer)));
+						printed = true;
 						oldPos = endPos;
+						break;
 					}
 				}
-				catch (Exception)
+				if (!printed)
 				{
-					SlackBot.Reply(command, "Whoops, someone did something with the feature list file :(");
-					returnStatus = true;
+					buffer = new byte[endPos - oldPos];
+					stream.Seek(-1, SeekOrigin.Current);
+					stream.Read(buffer, 0, buffer.Length);
+					slackBot.Reply(command, FormatRequestList(encoding.GetString(buffer)));
+					oldPos = endPos;
 				}
-				finally
-				{
-					if (stream != null)
-						stream.Close();
-				}
-
-				return returnStatus;
+			}
+			catch (Exception)
+			{
+				slackBot.Reply(command, "Whoops, someone did something with the feature list file :(");
+				returnStatus = true;
+			}
+			finally
+			{
+				if (stream != null)
+					stream.Close();
 			}
 
-			private string FormatRequestList(string requestList)
+			return returnStatus;
+		}
+
+		private string FormatRequestList(string requestList)
+		{
+			StringBuilder sb = new StringBuilder();
+			foreach (string s in requestList.Split('\n'))
 			{
-				StringBuilder sb = new StringBuilder();
-				foreach (string s in requestList.Split('\n'))
+				string[] temp = s.Split(',');
+				if (temp.Length >= 3)
 				{
-					string[] temp = s.Split(',');
-					if (temp.Length >= 3)
+					if (temp.Length > 3)
 					{
-						if (temp.Length > 3)
-						{
-							string[] temp2 = new string[temp.Length - 2];
-							Array.Copy(temp, 2, temp2, 0, temp2.Length);
-							temp[2] = String.Join(",", temp2);
-						}
-						sb.AppendLine(String.Format("At {0} {1} suggested: {2}", temp[0], temp[1], temp[2]));
+						string[] temp2 = new string[temp.Length - 2];
+						Array.Copy(temp, 2, temp2, 0, temp2.Length);
+						temp[2] = String.Join(",", temp2);
 					}
+					sb.AppendLine(String.Format("At {0} {1} suggested: {2}", temp[0], temp[1], temp[2]));
 				}
-				return sb.ToString();
 			}
+			return sb.ToString();
+		}
 
-			private bool WriteFeature(SlackBotCommand command)
+		private bool WriteFeature(SlackBotCommand command)
+		{
+			Random random = new Random();
+			int responseNum = random.Next(ResponseStrings.Length);
+
+			try
 			{
-				Random random = new Random();
-				int responseNum = random.Next(ResponseStrings.Length);
-
-				try
+				using (StreamWriter sw = File.AppendText(GetRelFilePath(RequestListFileName)))
 				{
-					using (StreamWriter sw = File.AppendText(GetRelFilePath(RequestListFileName)))
-					{
-						sw.WriteLine(DateTime.Now + "," + command.User.name + "," + command.Text);
-					}
+					sw.WriteLine(DateTime.Now + "," + command.User.name + "," + command.Text);
 				}
-				catch (Exception)
-				{
-					SlackBot.Reply(command, "Whoops, someone did something with the feature list file :(");
-					return true;
-				}
-
-				SlackBot.Reply(command, String.Format(ResponseStrings[responseNum], command.Text));
-				return false;
 			}
-
-			private string GetRelFilePath(string fileName)
+			catch (Exception)
 			{
-				while (!File.Exists(fileName))
-					fileName = "../" + fileName;
-
-				return fileName;
+				slackBot.Reply(command, "Whoops, someone did something with the feature list file :(");
+				return true;
 			}
+
+			slackBot.Reply(command, String.Format(ResponseStrings[responseNum], command.Text));
+			return false;
+		}
+
+		private string GetRelFilePath(string fileName)
+		{
+			while (!File.Exists(fileName))
+				fileName = "../" + fileName;
+
+			return fileName;
 		}
 	}
 }

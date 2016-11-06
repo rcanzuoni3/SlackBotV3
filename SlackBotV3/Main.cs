@@ -1,47 +1,46 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Configuration;
+﻿using System.Text.RegularExpressions;
 
 using SlackAPI;
+using Ninject;
+using System.Reflection;
+
 namespace SlackBotV3
 {
-    class Run
-    {
-        static void Main(string[] args)
-        {
-            var botTokenKey = "botToken";
+	class Run
+	{
+		static void Main(string[] args)
+		{
+			var kernel = new StandardKernel();
+			kernel.Load(Assembly.GetExecutingAssembly());
 
-            var botToken = ConfigurationManager.AppSettings.Get(botTokenKey);
-            SlackBotV3 slackBot = new SlackBotV3(botToken);
+			kernel.Get<Program>().RunProgram();
 
-            slackBot.Connect();
-            Console.ReadLine();
-        }
-    }
+		}
+	}
 
-    static class StringUtility
-    {
-        private static Regex m_multiSpaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+	static class StringUtility
+	{
+		private static Regex m_multiSpaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
 
-        public static string NormalizeSpace(this string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return "";
+		public static string NormalizeSpace(this string s)
+		{
+			if (string.IsNullOrEmpty(s))
+				return "";
 
-            s = m_multiSpaceRegex.Replace(s.Trim(), " ");
+			s = m_multiSpaceRegex.Replace(s.Trim(), " ");
 
-            return s;
-        }
-    };
+			return s;
+		}
+	};
 
-    static class UserUtility
-    {
-        public static string DisplayName(this User user)
-        {
-            if (!string.IsNullOrWhiteSpace(user.profile.real_name))
-                return user.profile.real_name;
+	static class UserUtility
+	{
+		public static string DisplayName(this User user)
+		{
+			if (!string.IsNullOrWhiteSpace(user.profile.real_name))
+				return user.profile.real_name;
 
-            return user.name;
-        }
-    }
+			return user.name;
+		}
+	}
 }

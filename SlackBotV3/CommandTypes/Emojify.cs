@@ -6,107 +6,118 @@ using System.Threading;
 
 namespace SlackBotV3.CommandTypes
 {
-	class EmojifyType : CommandType
+	public class EmojifyType : ICommandType
 	{
-		public override List<string> CommandNames() { return new List<string>() { "emojify" }; }
-		public override string Help(string commandName) { return "Type the command followed by two optional emojis and the text you wish to emojify"; }
-		public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-		public override CommandScope GetCommandScope() { return CommandScope.Global; }
+		ICommandHandlerProvider commandHandlerProvider;
 
-		public override Type GetCommandHandlerType()
+		public List<string> CommandNames() { return new List<string>() { "emojify" }; }
+		public string Help(string commandName) { return "Type the command followed by two optional emojis and the text you wish to emojify"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(Emojify); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
+
+		public EmojifyType() : this(new CommandHandlerProvider()) { }
+
+		public EmojifyType(ICommandHandlerProvider commandHandlerProvider)
 		{
-			return typeof(Emojify);
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
+
+	public class Emojify : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+		public Emojify(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
 		}
 
-		class Emojify : CommandHandler
+		private class Parameter
 		{
-			public Emojify(SlackBotV3 bot) : base(bot) { }
-
-			private class Parameter
+			public Parameter(SlackBotCommand command, List<string> messages)
 			{
-				public Parameter(SlackBotCommand command, List<string> messages)
-				{
-					this.command = command;
-					this.messages = messages;
-				}
-
-				public SlackBotCommand command;
-				public List<string> messages;
+				this.command = command;
+				this.messages = messages;
 			}
 
-			public override bool Execute(SlackBotCommand command)
+			public SlackBotCommand command;
+			public List<string> messages;
+		}
+
+		public bool Execute(SlackBotCommand command)
+		{
+			string commandText = command.Text;
+
+			if (string.IsNullOrWhiteSpace(commandText))
+				slackBot.Reply(command, "Please supply some text to emojify.");
+
+			string[] commandSplit = commandText.Split(' ');
+			Regex emojiRegex = new Regex(":.+:");
+			int startOutput = 0;
+			string emojiFront = ":filled:";
+			string emojiBack = ":blank:";
+
+			if (emojiRegex.IsMatch(commandSplit[0]))
 			{
-				string commandText = command.Text;
+				emojiFront = commandSplit[0];
+				startOutput++;
+			}
+			if (commandSplit.Length > 1 && emojiRegex.IsMatch(commandSplit[1]))
+			{
+				emojiBack = commandSplit[1];
+				startOutput++;
+			}
 
-				if (String.IsNullOrWhiteSpace(commandText))
-					SlackBot.Reply(command, "Please supply some text to emojify.");
-
-				string[] commandSplit = commandText.Split(' ');
-				Regex emojiRegex = new Regex(":.+:");
-				int startOutput = 0;
-				string emojiFront = ":filled:";
-				string emojiBack = ":blank:";
-
-				if (emojiRegex.IsMatch(commandSplit[0]))
+			List<string> messages = new List<string>();
+			for (int wordIndex = startOutput; wordIndex < commandSplit.Length; wordIndex++)
+			{
+				char[] letters = commandSplit[wordIndex].ToLower().ToCharArray();
+				StringBuilder output = new StringBuilder();
+				for (int i = 0; i < 8; i++)
 				{
-					emojiFront = commandSplit[0];
-					startOutput++;
-				}
-				if (commandSplit.Length > 1 && emojiRegex.IsMatch(commandSplit[1]))
-				{
-					emojiBack = commandSplit[1];
-					startOutput++;
-				}
-
-				List<string> messages = new List<string>();
-				for (int wordIndex = startOutput; wordIndex < commandSplit.Length; wordIndex ++)
-				{
-					char[] letters = commandSplit[wordIndex].ToLower().ToCharArray();
-					StringBuilder output = new StringBuilder();
-					for (int i = 0; i < 8; i++)
+					for (int j = 0; j < letters.Length; j++)
 					{
-						for (int j = 0; j < letters.Length; j++)
+						if (letters[j] == '\n')
+							output.AppendLine();
+						else
 						{
-							if (letters[j] == '\n')
-								output.AppendLine();
+							if (LetterMap.ContainsKey(letters[j]))
+								output.Append(String.Format(LetterMap[letters[j]][i], emojiBack, emojiFront));
 							else
-							{
-								if (LetterMap.ContainsKey(letters[j]))
-									output.Append(String.Format(LetterMap[letters[j]][i], emojiBack, emojiFront));
-								else
-									output.Append(letters[j] + emojiBack);
+								output.Append(letters[j] + emojiBack);
 
-								if (j + 1 < letters.Length)
-									output.Append(emojiBack);
-							}
-
-							if (output.Length > 4000)
-							{
-								SlackBot.Reply(command, "Message has word that is too large: " + commandSplit[wordIndex]);
-								return true;
-							}
+							if (j + 1 < letters.Length)
+								output.Append(emojiBack);
 						}
-						output.AppendLine();
+
+						if (output.Length > 4000)
+						{
+							slackBot.Reply(command, "Message has word that is too large: " + commandSplit[wordIndex]);
+							return true;
+						}
 					}
-					messages.Add(output.ToString());
+					output.AppendLine();
 				}
-				Thread processThread = new Thread(ReplyMessages);
-				processThread.Start(new Parameter(command, messages));
-				return false;
+				messages.Add(output.ToString());
 			}
+			Thread processThread = new Thread(ReplyMessages);
+			processThread.Start(new Parameter(command, messages));
+			return false;
+		}
 
-			private void ReplyMessages(object parameters)
+		private void ReplyMessages(object parameters)
+		{
+			Parameter parameter = (Parameter)parameters;
+			SlackBotCommand command = parameter.command;
+			for (int i = 0; i < parameter.messages.Count; i++)
 			{
-				Parameter parameter = (Parameter) parameters;
-				SlackBotCommand command = parameter.command;
-				for (int i = 0; i < parameter.messages.Count; i++)
-				{
-					SlackBot.Reply(command, parameter.messages[i]);
-					Thread.Sleep(300);
-				}
+				slackBot.Reply(command, parameter.messages[i]);
+				Thread.Sleep(300);
 			}
+		}
 
-			private static readonly Dictionary<char, List<string>> LetterMap = new Dictionary<char, List<string>>()
+		private static readonly Dictionary<char, List<string>> LetterMap = new Dictionary<char, List<string>>()
 			{
 				{ 'a', new List<string> { "{0}{1}{1}{1}{1}{1}{1}{0}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{0}{0}{0}{0}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{0}{0}{0}{0}{1}{1}", "{1}{1}{0}{0}{0}{0}{1}{1}", "{1}{1}{0}{0}{0}{0}{1}{1}" } },
 				{ 'b', new List<string> { "{1}{1}{1}{1}{1}{1}{1}{0}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{0}{0}{0}{0}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{0}", "{1}{1}{1}{1}{1}{1}{1}{0}", "{1}{1}{0}{0}{0}{0}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{0}" } },
@@ -151,6 +162,5 @@ namespace SlackBotV3.CommandTypes
 				{ '=', new List<string> { "{0}{0}{0}{0}{0}{0}{0}{0}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{0}{0}{0}{0}{0}{0}{0}{0}", "{0}{0}{0}{0}{0}{0}{0}{0}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{1}{1}{1}{1}{1}{1}{1}{1}", "{0}{0}{0}{0}{0}{0}{0}{0}" } },
 				{ '\'', new List<string> {"{0}{0}{1}{1}{1}{0}{0}{0}", "{0}{0}{1}{1}{1}{1}{0}{0}", "{0}{0}{0}{0}{1}{1}{0}{0}", "{0}{0}{0}{0}{1}{1}{0}{0}", "{0}{0}{0}{0}{0}{0}{0}{0}", "{0}{0}{0}{0}{0}{0}{0}{0}", "{0}{0}{0}{0}{0}{0}{0}{0}", "{0}{0}{0}{0}{0}{0}{0}{0}" } }
 			};
-		}
 	}
 }
