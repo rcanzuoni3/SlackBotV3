@@ -14,8 +14,6 @@ namespace SlackBotV3.CommandTypes
 		public Type GetCommandHandlerType() { return typeof(LMGTFY); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public LMGTFYType() : this(new CommandHandlerProvider()) { }
-
 		public LMGTFYType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

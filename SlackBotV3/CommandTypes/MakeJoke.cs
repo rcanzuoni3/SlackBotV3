@@ -16,49 +16,54 @@ namespace SlackBotV3.CommandTypes
 		public string Help(string commandName) { return "Type makejoke followed by someones name"; }
 		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
 		public CommandScope GetCommandScope() { return CommandScope.Global; }
-		public Type GetCommandHandlerType() { return typeof(Weather); }
-		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot,GetCommandHandlerType()); }
+		public Type GetCommandHandlerType() { return typeof(MakeJoke); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public class Weather : ICommandHandler
+		public MakeJokeType(ICommandHandlerProvider commandHandlerProvider)
 		{
-			private SlackBotV3 slackBot;
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
 
-			public Weather(SlackBotV3 slackBot)
+	public class MakeJoke : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public MakeJoke(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
+		}
+
+		public bool Execute(SlackBotCommand command)
+		{
+			try
 			{
-				this.slackBot = slackBot;
+				string name = string.IsNullOrWhiteSpace(command.Text) ? "The Great Ranzuoni" : command.Text;
+				HttpWebRequest request =
+					(HttpWebRequest)
+						WebRequest.Create("http://api.icndb.com/jokes/random");
+
+				HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+				StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+				string json = reader.ReadToEnd();
+				response.Dispose();
+
+				JObject joResponse = JObject.Parse(json);
+				if (joResponse["value"] != null)
+				{
+					string joke = joResponse["value"]["joke"].ToString();
+					joke = joke.Replace("Chuck Norris", name);
+					slackBot.Reply(command, HttpUtility.HtmlDecode(joke));
+				}
+				else
+					slackBot.Reply(command, "Crap. I forgot to handle that case.");
+
+				return false;
 			}
-
-			public bool Execute(SlackBotCommand command)
+			catch (Exception)
 			{
-				try
-				{
-					string name = string.IsNullOrWhiteSpace(command.Text) ? "The Great Ranzuoni" : command.Text;
-					HttpWebRequest request =
-						(HttpWebRequest)
-							WebRequest.Create("http://api.icndb.com/jokes/random");
-
-					HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-					StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-					string json = reader.ReadToEnd();
-					response.Dispose();
-
-					JObject joResponse = JObject.Parse(json);
-					if (joResponse["value"] != null)
-					{
-						string joke = joResponse["value"]["joke"].ToString();
-						joke = joke.Replace("Chuck Norris", name);
-						slackBot.Reply(command, HttpUtility.HtmlDecode(joke));
-					}
-					else
-						slackBot.Reply(command, "Crap. I forgot to handle that case.");
-
-					return false;
-				}
-				catch (Exception)
-				{
-					slackBot.Reply(command, "Stop trying to break slackbot");
-					return false;
-				}
+				slackBot.Reply(command, "Stop trying to break slackbot");
+				return false;
 			}
 		}
 	}

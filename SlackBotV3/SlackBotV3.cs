@@ -6,6 +6,7 @@ using System.Text;
 
 using SlackAPI;
 using SlackAPI.WebSocketMessages;
+using Ninject;
 
 namespace SlackBotV3
 {
@@ -25,15 +26,15 @@ namespace SlackBotV3
 		public SlackBotV3(string token)
 		{
 			SlackBot = new SlackSocketClient(token);
+			var kernel = new StandardKernel();
+			kernel.Load(Assembly.GetExecutingAssembly());
 
+			
 			foreach (Type t in this.GetType().Assembly.GetTypes())
 			{
-				if (new HashSet<Type>(t.GetInterfaces()).Contains(typeof(ICommandType)))
-				{
-					ConstructorInfo constructorInfo = t.GetConstructor(new Type[] { });
-					ICommandType commandType = (ICommandType)constructorInfo.Invoke(new object[] { });
-					CommandTypeRegistry.RegisterCommandType(commandType);
-				}
+				var ninjectBindings = kernel.GetBindings(t);
+				if (ninjectBindings.Count() > 0 && new HashSet<Type>(t.GetInterfaces()).Contains(typeof(ICommandType)))
+					CommandTypeRegistry.RegisterCommandType((ICommandType)kernel.Get(t));
 			}
 
 			CommandHandlerRegistry = new CommandHandlerRegistry(CommandTypeRegistry);

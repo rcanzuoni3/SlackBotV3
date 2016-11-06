@@ -17,8 +17,6 @@ namespace SlackBotV3.CommandTypes
 		public Type GetCommandHandlerType() { return typeof(Emojify); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public EmojifyType() : this(new CommandHandlerProvider()) { }
-
 		public EmojifyType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

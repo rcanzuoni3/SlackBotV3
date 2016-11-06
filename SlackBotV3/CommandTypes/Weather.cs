@@ -18,8 +18,6 @@ namespace SlackBotV3.CommandTypes
 		public Type GetCommandHandlerType() { return typeof(Weather); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public WeatherType() : this(new CommandHandlerProvider()) { }
-
 		public WeatherType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

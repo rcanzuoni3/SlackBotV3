@@ -15,8 +15,6 @@ namespace SlackBotV3.CommandTypes
 		public Type GetCommandHandlerType() { return typeof(GoodJob); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public GoodJobType() : this(new CommandHandlerProvider()) { }
-
 		public GoodJobType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

@@ -14,8 +14,6 @@ namespace SlackBotV3.CommandHandlers
 		public Type GetCommandHandlerType() { return typeof(DiceRoller); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public DiceRollerType() : this(new CommandHandlerProvider()) { }
-
 		public DiceRollerType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

@@ -16,8 +16,6 @@ namespace SlackBotV3.CommandTypes
 		public Type GetCommandHandlerType() { return typeof(TicTacToe); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public TicTacToeType() : this(new CommandHandlerProvider()) { }
-
 		public TicTacToeType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

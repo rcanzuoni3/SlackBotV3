@@ -13,7 +13,6 @@ namespace SlackBotV3.CommandHandlers
 		public CommandScope GetCommandScope() { return CommandScope.Global; }
 		public Type GetCommandHandlerType() { return typeof(CheckPrivilege); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
-		public CheckPrivelegeType() : this(new CommandHandlerProvider()) { }
 
 		public CheckPrivelegeType(ICommandHandlerProvider commandHandlerProvider)
 		{

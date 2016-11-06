@@ -5,20 +5,14 @@ namespace SlackBotV3.CommandTypes
 {
 	public class DefineType : ICommandType
 	{
-		ICommandHandlerProvider commandHandlerProvider;
+		private ICommandHandlerProvider commandHandlerProvider;
 
 		public List<string> CommandNames() { return new List<string>() { "define" }; }
 		public string Help(string commandName) { return "Type define followed by phrase to lookup defintion"; }
 		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
 		public CommandScope GetCommandScope() { return CommandScope.Global; }
 		public Type GetCommandHandlerType() { return typeof(Define); }
-
-		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot)
-		{
-			throw new NotImplementedException();
-		}
-
-		public DefineType() : this(new CommandHandlerProvider()) { }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
 		public DefineType(ICommandHandlerProvider commandHandlerProvider)
 		{

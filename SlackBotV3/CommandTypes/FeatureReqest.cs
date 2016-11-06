@@ -16,8 +16,6 @@ namespace SlackBotV3.CommandHandlers
 		public Type GetCommandHandlerType() { return typeof(FeatureRequest); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-		public FeatureRequestType() : this(new CommandHandlerProvider()) { }
-
 		public FeatureRequestType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;

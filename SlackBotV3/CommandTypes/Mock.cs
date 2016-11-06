@@ -14,7 +14,6 @@ namespace SlackBotV3.CommandTypes
 		public CommandScope GetCommandScope() { return CommandScope.Global; }
 		public Type GetCommandHandlerType() { return typeof(Mock); }
 		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
-		public MockType() : this(new CommandHandlerProvider()) { }
 		public MockType(ICommandHandlerProvider commandHandlerProvider)
 		{
 			this.commandHandlerProvider = commandHandlerProvider;
