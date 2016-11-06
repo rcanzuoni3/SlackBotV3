@@ -3,31 +3,42 @@ using System.Collections.Generic;
 
 namespace SlackBotV3.CommandTypes
 {
-	class RenameCommandType : CommandType
-    {
-        public override List<string> CommandNames(){ return new List<string>(){"rename"}; }
-        public override string Help(string commandName) { return "Type rename followed by the new bot name";  }
-        public override PrivilegeLevel GetPrivilegeLevel(){ return PrivilegeLevel.Admin; }
-        public override CommandScope GetCommandScope() { return CommandScope.Global; }
+	public class RenameCommandType : ICommandType
+	{
+		private ICommandHandlerProvider commandHandlerProvider;
 
-        public override Type GetCommandHandlerType()
-        {
-            return typeof(Rename);
-        }
+		public List<string> CommandNames() { return new List<string>() { "rename" }; }
+		public string Help(string commandName) { return "Type rename followed by the new bot name"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Admin; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(Rename); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-        class Rename : CommandHandler
-        {
-            public Rename(SlackBotV3 bot) : base(bot) { }
+		public RenameCommandType() : this(new CommandHandlerProvider()) { }
 
-            public override bool Execute(SlackBotCommand command)
-            {
-                if (string.IsNullOrWhiteSpace(command.Text))
-                    SlackBot.Reply(command, "You did not specify a new name");
-                else
-                    SlackBot.RenameBot(command.Text);
+		public RenameCommandType(ICommandHandlerProvider commandHandlerProvider)
+		{
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
 
-                return false;
-            }
-        }
-    }
+	public class Rename : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public Rename(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
+		}
+
+		public bool Execute(SlackBotCommand command)
+		{
+			if (string.IsNullOrWhiteSpace(command.Text))
+				slackBot.Reply(command, "You did not specify a new name");
+			else
+				slackBot.RenameBot(command.Text);
+
+			return false;
+		}
+	}
 }

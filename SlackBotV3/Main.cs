@@ -1,21 +1,20 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Configuration;
+﻿using System.Text.RegularExpressions;
 
 using SlackAPI;
+using Ninject;
+using System.Reflection;
+
 namespace SlackBotV3
 {
 	class Run
 	{
 		static void Main(string[] args)
 		{
-			var botTokenKey = "botToken";
-			var botToken = ConfigurationManager.AppSettings.Get(botTokenKey);
+			var kernel = new StandardKernel();
+			kernel.Load(Assembly.GetExecutingAssembly());
 
-			SlackBotV3 slackBot = new SlackBotV3(botToken);
-			slackBot.Connect();
+			kernel.Get<Program>().RunProgram();
 
-			Console.ReadLine();
 		}
 	}
 

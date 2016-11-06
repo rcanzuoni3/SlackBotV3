@@ -23,7 +23,8 @@ namespace SlackBotV3.CommandHandlers
 			this.commandHandlerProvider = commandHandlerProvider;
 		}
 	}
-	class FeatureRequest : ICommandHandler
+
+	public class FeatureRequest : ICommandHandler
 	{
 		private SlackBotV3 slackBot;
 

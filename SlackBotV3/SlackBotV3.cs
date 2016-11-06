@@ -28,7 +28,7 @@ namespace SlackBotV3
 
 			foreach (Type t in this.GetType().Assembly.GetTypes())
 			{
-				if (!t.IsAbstract && new HashSet<Type>(t.GetInterfaces()).Contains(typeof(ICommandType)))
+				if (new HashSet<Type>(t.GetInterfaces()).Contains(typeof(ICommandType)))
 				{
 					ConstructorInfo constructorInfo = t.GetConstructor(new Type[] { });
 					ICommandType commandType = (ICommandType)constructorInfo.Invoke(new object[] { });

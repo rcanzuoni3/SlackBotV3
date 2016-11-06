@@ -32,17 +32,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SlackAPI-master\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\SlackAPI\bin\Release\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SlackAPI, Version=1.0.4.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SlackAPI-master\bin\Debug\SlackAPI.dll</HintPath>
+    <Reference Include="SlackAPI">
+      <HintPath>..\SlackAPI\bin\Release\SlackAPI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -58,9 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandHandler.cs" />
+    <Compile Include="BotTokenProvider.cs" />
     <Compile Include="CommandTypeRegistry.cs" />
-    <Compile Include="CommandType.cs" />
     <Compile Include="CommandTypes\Acronym.cs" />
     <Compile Include="CommandTypes\CheckPrivilege.cs" />
     <Compile Include="CommandTypes\Countdown.cs" />
@@ -73,9 +70,7 @@
     <Compile Include="CommandTypes\GoodJob.cs" />
     <Compile Include="CommandTypes\GoodShit.cs" />
     <Compile Include="CommandTypes\Help.cs" />
-    <Compile Include="CommandTypes\KonamiCode.cs" />
     <Compile Include="CommandTypes\LMGTFY.cs" />
-    <Compile Include="CommandTypes\LooookIsABigOlDummy.cs" />
     <Compile Include="CommandTypes\MakeJoke.cs" />
     <Compile Include="CommandTypes\Martini.cs" />
     <Compile Include="CommandTypes\Mock.cs" />
@@ -91,7 +86,9 @@
     <Compile Include="CommandHandlerProvider.cs" />
     <Compile Include="ICommandType.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Ninject\Bindings.cs" />
     <Compile Include="PrivilegeLevel.cs" />
+    <Compile Include="program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SlackBotCommand.cs" />
     <Compile Include="SlackBotV3.cs" />

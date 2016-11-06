@@ -4,40 +4,51 @@ using System.Linq;
 
 namespace SlackBotV3.CommandHandlers
 {
-	class HelpType : CommandType
+	public class HelpType : ICommandType
 	{
-		public override List<string> CommandNames() { return new List<string>() { "help" }; }
-		public override string Help(string commandName) { return "Get the help for a command: @help [command name]"; }
-		public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-		public override CommandScope GetCommandScope() { return CommandScope.Global; }
+		private ICommandHandlerProvider commandHandlerProvider;
 
-		public override Type GetCommandHandlerType()
+		public List<string> CommandNames() { return new List<string>() { "help" }; }
+		public string Help(string commandName) { return "Get the help for a command: @help [command name]"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(HelpCommand); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
+
+		public HelpType() : this(new CommandHandlerProvider()) { }
+
+		public HelpType(ICommandHandlerProvider commandHandlerProvider)
 		{
-			return typeof(HelpCommand);
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
+
+	public class HelpCommand : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public HelpCommand(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
 		}
 
-		class HelpCommand : CommandHandler
+		public bool Execute(SlackBotCommand command)
 		{
-			public HelpCommand(SlackBotV3 bot) : base(bot) { }
-
-			public override bool Execute(SlackBotCommand command)
+			if (string.IsNullOrWhiteSpace(command.Text))
 			{
-				if (string.IsNullOrWhiteSpace(command.Text))
+				string response = "";
+				foreach (string commandName in slackBot.GetCommandNames().OrderBy(x => x))
 				{
-					string response = "";
-					foreach (string commandName in SlackBot.GetCommandNames().OrderBy(x => x))
-					{
-						response += commandName + ": ";
-						response += SlackBot.GetHelp(commandName) + "\n";
-					}
-
-					SlackBot.Reply(command, response);
+					response += commandName + ": ";
+					response += slackBot.GetHelp(commandName) + "\n";
 				}
-				else
-					SlackBot.Reply(command, SlackBot.GetHelp(command.Text));
 
-				return true;
+				slackBot.Reply(command, response);
 			}
+			else
+				slackBot.Reply(command, slackBot.GetHelp(command.Text));
+
+			return true;
 		}
 	}
 }

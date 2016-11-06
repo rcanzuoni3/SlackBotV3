@@ -3,27 +3,38 @@ using System.Collections.Generic;
 
 namespace SlackBotV3.CommandTypes
 {
-	class GoodShitType : CommandType
+	public class GoodShitType : ICommandType
 	{
-		public override List<string> CommandNames() { return new List<string>() { "goodShit", "goodshit" }; }
-		public override string Help(string commandName) { return "That's some goooooood shit"; }
-		public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-		public override CommandScope GetCommandScope() { return CommandScope.Global; }
+		private ICommandHandlerProvider commandHandlerProvider;
 
-		public override Type GetCommandHandlerType()
+		public List<string> CommandNames() { return new List<string>() { "goodShit", "goodshit" }; }
+		public string Help(string commandName) { return "That's some goooooood shit"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(GoodShit); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
+
+		public GoodShitType() : this(new CommandHandlerProvider()) { }
+
+		public GoodShitType(ICommandHandlerProvider commandHandlerProvider)
 		{
-			return typeof(GoodShit);
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
+
+	public class GoodShit : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public GoodShit(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
 		}
 
-		class GoodShit : CommandHandler
+		public bool Execute(SlackBotCommand command)
 		{
-			public GoodShit(SlackBotV3 bot) : base(bot) { }
-
-			public override bool Execute(SlackBotCommand command)
-			{
-				SlackBot.Reply(command, string.Format(":ok_hand::eyes::ok_hand::eyes::ok_hand::eyes::ok_hand::eyes::ok_hand::eyes: good shit go౦ԁ sHit:ok_hand: thats :heavy_check_mark: some good:ok_hand::ok_hand:shit right:ok_hand::ok_hand:th :ok_hand: ere:ok_hand::ok_hand::ok_hand: right:heavy_check_mark:there :heavy_check_mark::heavy_check_mark:if i do ƽaү so my selｆ :100: i say so :100: thats what im talking about right there right there (chorus: ʳᶦᵍʰᵗ ᵗʰᵉʳᵉ) mMMMMᎷМ:100: :ok_hand::ok_hand: :ok_hand:НO0ОଠＯOOＯOОଠଠOoooᵒᵒᵒᵒᵒᵒᵒᵒᵒ:ok_hand: :ok_hand::ok_hand: :ok_hand: :100: :ok_hand: :eyes: :eyes: :eyes: :ok_hand::ok_hand:Good shit"));
-				return false;
-			}
+			slackBot.Reply(command, string.Format(":ok_hand::eyes::ok_hand::eyes::ok_hand::eyes::ok_hand::eyes::ok_hand::eyes: good shit go౦ԁ sHit:ok_hand: thats :heavy_check_mark: some good:ok_hand::ok_hand:shit right:ok_hand::ok_hand:th :ok_hand: ere:ok_hand::ok_hand::ok_hand: right:heavy_check_mark:there :heavy_check_mark::heavy_check_mark:if i do ƽaү so my selｆ :100: i say so :100: thats what im talking about right there right there (chorus: ʳᶦᵍʰᵗ ᵗʰᵉʳᵉ) mMMMMᎷМ:100: :ok_hand::ok_hand: :ok_hand:НO0ОଠＯOOＯOОଠଠOoooᵒᵒᵒᵒᵒᵒᵒᵒᵒ:ok_hand: :ok_hand::ok_hand: :ok_hand: :100: :ok_hand: :eyes: :eyes: :eyes: :ok_hand::ok_hand:Good shit"));
+			return false;
 		}
 	}
 }
