@@ -10,6 +10,7 @@ namespace SlackBotV3.Ninject
 		{
 			Bind<IBotTokenProvider>().To<BotTokenProvider>();
 			Bind<ICommandHandlerProvider>().To<CommandHandlerProvider>();
+			Bind<SlackBotV3>().ToSelf().InSingletonScope();
 
 			Bind<AcronymType>().ToSelf();
 			Bind<CheckPrivelegeType>().ToSelf();

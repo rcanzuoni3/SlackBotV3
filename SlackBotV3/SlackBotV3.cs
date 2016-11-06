@@ -14,6 +14,7 @@ namespace SlackBotV3
 	{
 		private const string IconUrl = "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-07-06/7287183376_98f07e9f81fa3dea7be9_72.jpg";
 		private string BotName = "SlackBotV3";
+		private const string botTokenKey = "botTokenBase64String";
 
 		private HashSet<String> Admins = new HashSet<string>() { "ranzuoni", "lbrooks", "ahachten", "plafata", "nsmith" };
 		private HashSet<string> Supers = new HashSet<string>() { "plafata", "lbrooks", "ranzuoni", "nsmith" };
@@ -23,9 +24,9 @@ namespace SlackBotV3
 
 		private SlackSocketClient SlackBot;
 
-		public SlackBotV3(string token)
+		public SlackBotV3(IBotTokenProvider tokenProvider)
 		{
-			SlackBot = new SlackSocketClient(token);
+			SlackBot = new SlackSocketClient(tokenProvider.GetBotToken(botTokenKey));
 			var kernel = new StandardKernel();
 			kernel.Load(Assembly.GetExecutingAssembly());
 

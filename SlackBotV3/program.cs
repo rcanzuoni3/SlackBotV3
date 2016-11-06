@@ -4,21 +4,16 @@ namespace SlackBotV3
 {
 	public class Program
 	{
-		private IBotTokenProvider botTokenProvider;
-		private const string botTokenKey = "botTokenBase64String";
+		private SlackBotV3 slackBot;
 
-		public Program(IBotTokenProvider botTokenProvider)
+		public Program(SlackBotV3 slackBot)
 		{
-			this.botTokenProvider = botTokenProvider;
+			this.slackBot = slackBot;
 		}
 
 		public void RunProgram()
 		{
-			var slackToken = botTokenProvider.GetBotToken(botTokenKey);
-			SlackBotV3 slackBot = new SlackBotV3(slackToken);
-
 			slackBot.Connect();
-
 			Console.ReadLine();
 		}
 	}
