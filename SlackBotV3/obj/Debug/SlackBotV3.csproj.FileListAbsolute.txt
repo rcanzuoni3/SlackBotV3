@@ -24,3 +24,15 @@ C:\Users\rcanz\Documents\Slackbot\SlackBotV3\SlackBotV3\bin\Debug\SlackAPI.pdb
 C:\Users\rcanz\Documents\Slackbot\SlackBotV3\SlackBotV3\obj\Debug\SlackBotV3.csprojResolveAssemblyReference.cache
 C:\Users\rcanz\Documents\Slackbot\SlackBotV3\SlackBotV3\bin\Debug\Ninject.dll
 C:\Users\rcanz\Documents\Slackbot\SlackBotV3\SlackBotV3\bin\Debug\Ninject.xml
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\SlackBotV3.exe.config
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\obj\Debug\SlackBotV3.exe
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\obj\Debug\SlackBotV3.pdb
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\SlackBotV3.exe
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\SlackBotV3.pdb
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\Newtonsoft.Json.dll
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\Ninject.dll
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\SlackAPI.dll
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\SlackAPI.pdb
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\Newtonsoft.Json.xml
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\Ninject.xml
+C:\Users\rcanz\Documents\SlackBotV3\SlackBotV3\SlackBotV3\bin\Debug\WebSocket4Net.dll

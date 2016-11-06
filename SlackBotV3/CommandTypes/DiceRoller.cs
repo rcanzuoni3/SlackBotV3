@@ -3,34 +3,45 @@ using System.Collections.Generic;
 
 namespace SlackBotV3.CommandHandlers
 {
-	class DiceRollerType : CommandType
-    {
-        public override List<string> CommandNames(){ return new List<string>(){"roll"}; }
-        public override string Help(string commandName) { return "Type roll to roll the dice";  }
-        public override PrivilegeLevel GetPrivilegeLevel(){ return PrivilegeLevel.Normal; }
-        public override CommandScope GetCommandScope() { return CommandScope.Global; }
+	public class DiceRollerType : ICommandType
+	{
+		ICommandHandlerProvider commandHandlerProvider;
 
-        public override Type GetCommandHandlerType()
-        {
-            return typeof(DiceRoller);
-        }
+		public List<string> CommandNames() { return new List<string>() { "roll" }; }
+		public string Help(string commandName) { return "Type roll to roll the dice"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(DiceRoller); }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot) { return commandHandlerProvider.GetCommandHandler(slackBot, GetCommandHandlerType()); }
 
-        class DiceRoller : CommandHandler
-        {
-            public DiceRoller(SlackBotV3 bot) : base(bot) { }
+		public DiceRollerType() : this(new CommandHandlerProvider()) { }
 
-            public override bool Execute(SlackBotCommand command)
-            {
-                Random random = new Random();
-                int die1 = random.Next(6) + 1;
-                int die2 = random.Next(6) + 1;
+		public DiceRollerType(ICommandHandlerProvider commandHandlerProvider)
+		{
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
 
-                int roll = die1 + die2;
+	public class DiceRoller : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
 
-                SlackBot.Reply(command, string.Format("{0} rolled a {1}", command.User.name, roll), iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/2-Dice-Icon.svg/2000px-2-Dice-Icon.svg.png");
+		public DiceRoller(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
+		}
 
-                return false;
-            }
-        }
-    }
+		public bool Execute(SlackBotCommand command)
+		{
+			Random random = new Random();
+			int die1 = random.Next(6) + 1;
+			int die2 = random.Next(6) + 1;
+
+			int roll = die1 + die2;
+
+			slackBot.Reply(command, string.Format("{0} rolled a {1}", command.User.name, roll), iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/2-Dice-Icon.svg/2000px-2-Dice-Icon.svg.png");
+
+			return false;
+		}
+	}
 }

@@ -34,11 +34,15 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SlackAPI\SlackAPI\bin\Debug\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\SlackAPI-master\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="SlackAPI, Version=1.0.4.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SlackAPI-master\bin\Debug\SlackAPI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -49,14 +53,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebSocket4Net">
+      <HintPath>..\SlackAPI-master\bin\Debug\WebSocket4Net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandHandler.cs" />
     <Compile Include="CommandTypeRegistry.cs" />
     <Compile Include="CommandType.cs" />
     <Compile Include="CommandTypes\Acronym.cs" />
-    <Compile Include="CommandTypes\AdviceType.cs" />
-    <Compile Include="CommandTypes\BreakBot.cs" />
     <Compile Include="CommandTypes\CheckPrivilege.cs" />
     <Compile Include="CommandTypes\Countdown.cs" />
     <Compile Include="CommandTypes\Define.cs" />
@@ -94,12 +99,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\SlackAPI\SlackAPI\SlackAPI.csproj">
-      <Project>{0c0a58a8-174e-4a4c-907b-c3569144d15d}</Project>
-      <Name>SlackAPI</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

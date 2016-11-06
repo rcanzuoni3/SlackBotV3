@@ -3,27 +3,42 @@ using System.Collections.Generic;
 
 namespace SlackBotV3.CommandTypes
 {
-	class DefineType : CommandType
-    {
-        public override List<string> CommandNames() { return new List<string>() { "define" }; }
-        public override string Help(string commandName) { return "Type define followed by phrase to lookup defintion"; }
-        public override PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
-        public override CommandScope GetCommandScope() { return CommandScope.Global; }
+	public class DefineType : ICommandType
+	{
+		ICommandHandlerProvider commandHandlerProvider;
 
-        public override Type GetCommandHandlerType()
-        {
-            return typeof(Define);
-        }
+		public List<string> CommandNames() { return new List<string>() { "define" }; }
+		public string Help(string commandName) { return "Type define followed by phrase to lookup defintion"; }
+		public PrivilegeLevel GetPrivilegeLevel() { return PrivilegeLevel.Normal; }
+		public CommandScope GetCommandScope() { return CommandScope.Global; }
+		public Type GetCommandHandlerType() { return typeof(Define); }
 
-        class Define : CommandHandler
-        {
-            public Define(SlackBotV3 bot) : base(bot) { }
+		public ICommandHandler MakeCommandHandler(SlackBotV3 slackBot)
+		{
+			throw new NotImplementedException();
+		}
 
-            public override bool Execute(SlackBotCommand command)
-            {
-                SlackBot.Reply(command, "http://www.urbandictionary.com/define.php?term=" + System.Uri.EscapeDataString(command.Text));
-                return false;
-            }
-        }
-    }
+		public DefineType() : this(new CommandHandlerProvider()) { }
+
+		public DefineType(ICommandHandlerProvider commandHandlerProvider)
+		{
+			this.commandHandlerProvider = commandHandlerProvider;
+		}
+	}
+
+	public class Define : ICommandHandler
+	{
+		private SlackBotV3 slackBot;
+
+		public Define(SlackBotV3 slackBot)
+		{
+			this.slackBot = slackBot;
+		}
+
+		public bool Execute(SlackBotCommand command)
+		{
+			slackBot.Reply(command, "http://www.urbandictionary.com/define.php?term=" + System.Uri.EscapeDataString(command.Text));
+			return false;
+		}
+	}
 }
