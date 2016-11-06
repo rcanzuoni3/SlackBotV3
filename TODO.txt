@@ -1,0 +1,37 @@
+SlackBot goals
+	
+	Refactor
+ 
+		2b. Create SlackBotV3 interface, move things to depend on the interface
+		3. Create configuration module
+			Move work specific information into config file
+				CommandPrefix
+				Admins
+				IconUrl
+				Commands //it will go through this list of classes that implement ICommandHandler and register these commands
+				BotToken
+				UserToken
+			The configuration should be dynamic, so if an admin is added it will be added
+			through the configuration object, which will be written out when the bot
+			terminates
+		
+		4. Save state on termination
+			This includes CommandHandlerRegistry and Configuration
+
+		5. Create logging module
+
+		6. Features to add
+			Help
+			MakeAdmin/TakeAdmin
+			Chess
+			Silence/Unsilence //takes a given channel, to replace Join
+			Odds are
+			Rock paper scissors
+			Super tic-tac-toe
+			Connect 4
+		7. Undo - This will involve changes to ICommandHandler and ISlackBot interfaces
+			Since it doesn't make any sense for some commands to be undone we will have to
+			determine first if the command can be undone, before pushing it to the stack
+			The stack will be either global, channel specifc or channel-user specific	
+
+		

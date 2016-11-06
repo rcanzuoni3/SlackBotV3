@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackBotV3", "SlackBotV3.csproj", "{039AAD50-A72F-43C8-88CF-D9A854383F42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{9E242BC9-C588-457F-A222-B70251A874AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackAPI", "..\..\..\SlackAPI\SlackAPI\SlackAPI.csproj", "{0C0A58A8-174E-4A4C-907B-C3569144D15D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{039AAD50-A72F-43C8-88CF-D9A854383F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039AAD50-A72F-43C8-88CF-D9A854383F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039AAD50-A72F-43C8-88CF-D9A854383F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039AAD50-A72F-43C8-88CF-D9A854383F42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E242BC9-C588-457F-A222-B70251A874AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E242BC9-C588-457F-A222-B70251A874AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E242BC9-C588-457F-A222-B70251A874AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E242BC9-C588-457F-A222-B70251A874AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C0A58A8-174E-4A4C-907B-C3569144D15D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C0A58A8-174E-4A4C-907B-C3569144D15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C0A58A8-174E-4A4C-907B-C3569144D15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C0A58A8-174E-4A4C-907B-C3569144D15D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
