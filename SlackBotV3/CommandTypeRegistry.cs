@@ -4,7 +4,7 @@ namespace SlackBotV3
 {
 	class CommandTypeRegistry
 	{
-		private static int TypeID = 0;
+		private int TypeID = 0;
 
 		private Dictionary<string, int> CommandNameToID = new Dictionary<string, int>();
 

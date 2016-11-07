@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace Tests
 {
 	[TestFixture]
-	public class BotTokenProviderTest
+	public class AppConfigValueRetrieverTest
 	{
-		IBotTokenProvider subject;
+		IAppConfigValueRetriever subject;
 
 		[SetUp]
 		public void Setup()
 		{
-			subject = new BotTokenProvider();
+			subject = new AppConfigValueRetriever();
 		}
 
 		[Test]
@@ -20,7 +20,7 @@ namespace Tests
 		{
 			var keyNotInAppConfig = "ajksdfl;asdflasdfasl;djf";
 
-			Assert.Throws<KeyNotFoundException>(() => subject.GetBotToken(keyNotInAppConfig));
+			Assert.Throws<KeyNotFoundException>(() => subject.GetValue(keyNotInAppConfig));
 		}
 	}
 }

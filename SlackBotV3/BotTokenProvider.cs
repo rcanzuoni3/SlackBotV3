@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Text;
 
 namespace SlackBotV3
@@ -12,13 +10,16 @@ namespace SlackBotV3
 
 	public class BotTokenProvider : IBotTokenProvider
 	{
+		IAppConfigValueRetriever appConfigValueRetriever;
+
+		public BotTokenProvider(IAppConfigValueRetriever appConfigValueRetriever)
+		{
+			this.appConfigValueRetriever = appConfigValueRetriever;
+		}
+
 		public string GetBotToken(string botTokenKey)
 		{
-			var botTokenBase64String = ConfigurationManager.AppSettings.Get(botTokenKey);
-
-			if (string.IsNullOrWhiteSpace(botTokenBase64String))
-				throw new KeyNotFoundException("Could not fine key {0} in the app.config");
-
+			var botTokenBase64String = appConfigValueRetriever.GetValue(botTokenKey);
 			var botTokenBytes = Convert.FromBase64String(botTokenBase64String);
 
 			return Encoding.ASCII.GetString(botTokenBytes);

@@ -16,8 +16,8 @@ namespace SlackBotV3
 		private string BotName = "SlackBotV3";
 		private const string botTokenKey = "botTokenBase64String";
 
-		private HashSet<String> Admins = new HashSet<string>() { "ranzuoni", "lbrooks", "ahachten", "plafata", "nsmith" };
-		private HashSet<string> Supers = new HashSet<string>() { "plafata", "lbrooks", "ranzuoni", "nsmith" };
+		private HashSet<string> Admins = new HashSet<string>() { "ranzuoni", "ahachten", "plafata", "nsmith" };
+		private HashSet<string> Supers = new HashSet<string>() { "plafata", "ranzuoni"};
 
 		private CommandTypeRegistry CommandTypeRegistry = new CommandTypeRegistry();
 		private CommandHandlerRegistry CommandHandlerRegistry;

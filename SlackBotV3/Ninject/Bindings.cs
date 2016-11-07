@@ -8,6 +8,7 @@ namespace SlackBotV3.Ninject
 	{
 		public override void Load()
 		{
+			Bind<IAppConfigValueRetriever>().To<AppConfigValueRetriever>();
 			Bind<IBotTokenProvider>().To<BotTokenProvider>();
 			Bind<ICommandHandlerProvider>().To<CommandHandlerProvider>();
 			Bind<SlackBotV3>().ToSelf().InSingletonScope();
